@@ -1,4 +1,5 @@
-"use client";
+'use client';
+
 import {
   Dialog,
   DialogClose,
@@ -8,64 +9,73 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "./ui/button";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
-import CodeMirror from "@uiw/react-codemirror";
-import { json } from "@codemirror/lang-json";
-import { useState } from "react";
+} from '@/components/ui/dialog';
+import { Button } from './ui/button';
+import { Label } from './ui/label';
+import { Input } from './ui/input';
+import CodeMirror from '@uiw/react-codemirror';
+import { json } from '@codemirror/lang-json';
+import { useState } from 'react';
 
-const AddJsonDialog = () => {
-  const [jsonData, setJsonData] = useState<string>("");
-  const [jsonName, setJsonName] = useState<string>("");
-  const handelSave = ()=>{
+interface AddJsonDialogProps {
+  onSave: (name: string, value: string) => Promise<void>;
+}
+export default function AddJsonDialog({ onSave }: AddJsonDialogProps) {
+  const [jsonName, setJsonName] = useState('');
+  const [jsonData, setJsonData] = useState('');
+  const [openModal, setOpenModal] = useState<boolean>(false);
 
-  }
+  const handleSave = async () => {
+    await onSave(jsonName, jsonData);
+    setOpenModal(false);
+    setJsonData('');
+    setJsonName('');
+  };
+
   return (
-    <Dialog>
-      <DialogTrigger>
+    <Dialog open={openModal} onOpenChange={setOpenModal}>
+      <DialogTrigger asChild>
         <Button>Add JSON Data</Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className='max-w-4xl'>
         <DialogHeader>
           <DialogTitle>JSON Editor</DialogTitle>
-          <DialogDescription>Edit and save your data.</DialogDescription>
+          <DialogDescription>Edit and save your JSON data.</DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4">
-          <div className="grid gap-2">
+
+        <div className='grid gap-4'>
+          <div className='grid gap-2'>
             <Label>JSON Name</Label>
             <Input
-              placeholder="Enter JSON Name"
-              className="rounded-none"
               value={jsonName}
-              onChange={(e) => {
-                setJsonName(e.target.value);
-              }}
+              placeholder='Enter JSON Name'
+              className='rounded-none'
+              onChange={(e) => setJsonName(e.target.value)}
             />
           </div>
-          <div className="grid gap-2">
+          <div className='grid gap-2'>
             <Label>JSON Data</Label>
             <CodeMirror
-              className="border shadow-sm"
               value={jsonData}
-              height="400px"
+              height='400px'
               extensions={[json()]}
-              onChange={(value) => {
-                setJsonData(value);
-              }}
+              onChange={(value) => setJsonData(value)}
+              className='border shadow-sm'
             />
           </div>
+
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type='button' variant='secondary'>
+                Close
+              </Button>
+            </DialogClose>
+            <Button disabled={!jsonName || !jsonData} onClick={handleSave}>
+              Save
+            </Button>
+          </DialogFooter>
         </div>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button type="button" variant={"secondary"}>Close</Button>
-          </DialogClose>
-          <Button disabled={!jsonName || !jsonData} onClick={handelSave}>Save</Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
-};
-
-export default AddJsonDialog;
+}
